@@ -1,0 +1,1 @@
+choose a file format and then try to parse it (at least first four blocks)
