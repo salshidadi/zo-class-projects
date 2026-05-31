@@ -1,6 +1,6 @@
 # Archive Files Project
 
-A C command-line tool that bundles multiple files into a single `.arc` archive file and manages them through a set of option flags.
+A C command-line tool that bundles multiple files into a single `.PA` archive file and manages them through a set of option flags.
 
 # Overview
 
@@ -20,7 +20,7 @@ The archive file is divided into two sections:
 
 **Header**
 - Archive metadata: Magic Number, Version, and Files Count
-- Files metadata table: one entry per stored file, each containing the File Size, Name Length, and File Name
+- Files metadata table: containing the File Size, Name Length, and File Name
 
 **Data**
 - The raw content of each file stored sequentially, in the same order as their entries in the files metadata table
@@ -46,9 +46,9 @@ The archive file is divided into two sections:
 # Example
 
 ```bash
-Arch -c abc.arc
-Arch -i abc.arc file1.txt
-Arch -l abc.arc
+Arch -c abc.PA
+Arch -i abc.PA file1.txt
+Arch -l abc.PA
 ```
 
 ```text
