@@ -1,0 +1,49 @@
+# Random Block Merger
+
+Part 6 of the C command-line file processing project.
+Merges all blocks — both real and random — into a single output file.
+
+# Overview
+
+Using the `.pmd` metadata file, the program merges all blocks including the random ones generated in Requirement 5 into one combined output file with a `.mr` extension.
+
+# Concept
+
+The project focuses on:
+
+- Reading the 16-bit block map from the metadata
+- Merging real and random blocks into a single file
+- Producing a combined output that preserves the full block sequence
+
+The 16-bit variable from Requirement 5 identifies which blocks are real and which are random. The merger uses this map to read all blocks in order and combine them into the output file.
+
+# How It Works
+
+1. The user runs the program with `-m`, the `.pmd` metadata file, `-R`, and the output filename
+2. `-m` activates merge mode and reads the metadata file
+3. `-R` signals that the blocks include random blocks and specifies the output filename with `.mr` extension
+4. The program reads the 16-bit block map from the metadata
+5. All blocks — real and random — are merged in order into the output file
+
+# Example
+
+## Command
+```bash
+./app -m abc.file.pmd -R output.mr
+```
+
+## 16-bit Block Map
+```text
+Total blocks: 9  (6 real + 3 random)
+
+Bit position: 15 ... 8  7  6  5  4  3  2  1  0
+Bit value:     0  ... 0  1  1  1  0  0  0  0  0
+
+Block 1–6: bit = 0 → real block
+Block 7–9: bit = 1 → random block
+```
+
+## Output
+```text
+output.mr  (all 9 blocks merged into one file)
+```
