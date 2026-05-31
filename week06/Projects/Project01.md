@@ -5,7 +5,7 @@ A C command-line tool that bundles multiple files into a single `.arc` archive f
 # Overview
 
 The program takes a command-line option and performs the corresponding archive operation. Each option controls a different aspect of managing the archive and the files stored inside it.
-![Archive Tool Diagram](./images/Archive Tool.png)
+![Archive Tool Diagram](./images/ArchiveTool.png)
 
 # Concept
 
