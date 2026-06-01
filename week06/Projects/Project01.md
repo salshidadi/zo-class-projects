@@ -19,16 +19,16 @@ The project focuses on:
 The archive file is divided into two sections:
 
 **Header**
-- Archive metadata: Magic Number, Version, and Files Count
+- Archive metadata: Magic Number, Version, and File Count
 - Files metadata table: containing the File Size, Name Length, and File Name
 
 **Data**
-- The raw content of each file stored sequentially, in the same order as their entries in the files metadata table
+- The raw content of each file is stored sequentially, in the same order as its entries in the file's metadata table
 
 ## How It Works
 
 1. The user runs the program from the terminal with an option flag
-2. The program parses the option and any additional arguments (archive name, filenames)
+2. The program parses the option and any additional arguments (archive name, file names)
 3. The corresponding operation is performed on the archive file
 4. The archive's header and data section are updated to reflect the change
 
@@ -69,11 +69,10 @@ file1.txt
 | Clean Code        | Readable, well-structured, and consistent style  |
 | Modules           | Code divided into reusable components            |
 | Output            | Colored and copyrighted terminal output          |
-| README            | Project overview written in Markdown             |
 | Documentation     | Feature and usage documentation in Markdown      |
 | Icon + Code Name  | Project has a unique icon and code name          |
 
-### Repo Requirements
+### Repository Requirements
 
 | Requirement  | Description                                         |
 |--------------|-----------------------------------------------------|
@@ -82,3 +81,4 @@ file1.txt
 | License      | A license file defining usage rights                |
 | Contribution | Guidelines for contributing to the project          |
 | Installation | Step-by-step instructions for building and running  |
+| README File  | Project overview written in Markdown                |
