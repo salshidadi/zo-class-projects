@@ -3,7 +3,7 @@
 Part 3 of the C command-line file processing project.
 The same program as Requirement 1 extended with a merge option that reconstructs the original file from its split parts.
 
-# Overview
+## Overview
 
 The program now supports two modes:
 
@@ -12,7 +12,7 @@ The program now supports two modes:
 
 For the merge, the user only needs to provide the `.pmd` metadata file. The program reads it to find all the information required to locate and reassemble the split files.
 
-# Concept
+## Concept
 
 The project focuses on:
 
@@ -23,7 +23,7 @@ The project focuses on:
 
 The `.pmd` file from Requirement 2 contains everything needed: the original filename, block size, block count, and extra bytes — so the merger can locate and reassemble all parts without the user specifying them manually.
 
-# How It Works
+## How It Works
 
 **Split mode (`-p`):**
 1. The user passes the file path and number of blocks
@@ -37,14 +37,14 @@ The `.pmd` file from Requirement 2 contains everything needed: the original file
 4. Blocks are written sequentially into a single output file
 5. Extra bytes are handled according to the metadata
 
-# Example
+## Example
 
-## Split
+### Split
 ```bash
 ./app -p movie.mp4 4
 ```
 
-## Merge
+### Merge
 ```bash
 ./app -m movie.mp4.pmd
 ```
