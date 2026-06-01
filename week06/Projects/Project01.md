@@ -42,6 +42,9 @@ The archive file is divided into two sections:
 | `-l`   | List all files in the archive  |
 | `-x`   | Extract a file from the archive|
 | `-h`   | Show help reference            |
+| `-n`   | Number of files                |
+| `-r`   | replace file                   |
+
 
 ## Example
 
