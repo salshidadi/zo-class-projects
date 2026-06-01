@@ -2,11 +2,11 @@
 
 A C program that reads a binary file and parses its header according to a specific file format layout.
 
-# Overview
+## Overview
 
 Every file format has a defined binary structure where each field is stored at a specific byte offset with a fixed size. The program reads a file in binary and maps its raw bytes to meaningful data based on that layout.
 
-# Concept
+## Concept
 
 The project focuses on:
 
@@ -17,7 +17,7 @@ The project focuses on:
 
 Each file format defines its own header structure. By reading the bytes at the right offsets, the program can extract meaningful information such as file type, size, dimensions, or version — without relying on any external library.
 
-# How It Works
+## How It Works
 
 1. Choose a file format (image, audio, executable, etc.)
 2. Study its binary layout specification and identify the fields and their offsets
@@ -25,9 +25,9 @@ Each file format defines its own header structure. By reading the bytes at the r
 4. Read and parse at least the first four fields from the header
 5. Display the extracted data
 
-# Example
+## Example
 
-## Generic File Header Layout
+### Generic File Header Layout
 
 | Offset | Size    | Field      | Description                     |
 |--------|---------|------------|---------------------------------|
@@ -36,7 +36,7 @@ Each file format defines its own header structure. By reading the bytes at the r
 | 6      | 4 bytes | Field 3    | Format-specific field           |
 | 10     | 4 bytes | Field 4    | Format-specific field           |
 
-## Output
+### Output
 ```text
 Signature : ...
 File Size : ... bytes
