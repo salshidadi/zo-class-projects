@@ -2,12 +2,12 @@
 
 A C command-line tool that bundles multiple files into a single `.PA` archive file and manages them through a set of option flags.
 
-# Overview
+## Overview
 
 The program takes a command-line option and performs the corresponding archive operation. Each option controls a different aspect of managing the archive and the files stored inside it.
 ![Archive Tool Diagram](./images/ArchiveTool.png)
 
-# Concept
+## Concept
 
 The project focuses on:
 
@@ -25,14 +25,14 @@ The archive file is divided into two sections:
 **Data**
 - The raw content of each file stored sequentially, in the same order as their entries in the files metadata table
 
-# How It Works
+## How It Works
 
 1. The user runs the program from the terminal with an option flag
 2. The program parses the option and any additional arguments (archive name, filenames)
 3. The corresponding operation is performed on the archive file
 4. The archive's header and data section are updated to reflect the change
 
-# Options
+## Options
 
 | Option | Description                    |
 |--------|--------------------------------|
@@ -43,7 +43,7 @@ The archive file is divided into two sections:
 | `-x`   | Extract a file from the archive|
 | `-h`   | Show help reference            |
 
-# Example
+## Example
 
 ```bash
 Arch -c abc.PA
@@ -54,3 +54,31 @@ Arch -l abc.PA
 ```text
 file1.txt
 ```
+
+<br>
+
+
+## Specific to Students of 01 Bootcamp
+
+### Project Requirements
+
+| Requirement       | Description                                      |
+|-------------------|--------------------------------------------------|
+| Multiple Files    | Code must be split across multiple source files  |
+| Functions         | Logic must be organized into functions           |
+| Clean Code        | Readable, well-structured, and consistent style  |
+| Modules           | Code divided into reusable components            |
+| Output            | Colored and copyrighted terminal output          |
+| README            | Project overview written in Markdown             |
+| Documentation     | Feature and usage documentation in Markdown      |
+| Icon + Code Name  | Project has a unique icon and code name          |
+
+### Repo Requirements
+
+| Requirement  | Description                                         |
+|--------------|-----------------------------------------------------|
+| `src/`       | Directory containing all source code files          |
+| `docs/`      | Directory containing documentation files            |
+| License      | A license file defining usage rights                |
+| Contribution | Guidelines for contributing to the project          |
+| Installation | Step-by-step instructions for building and running  |
