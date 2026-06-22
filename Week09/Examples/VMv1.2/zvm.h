@@ -9,7 +9,7 @@
 
 #define ZVM_RX_REGISTERS_COUNT 4
 
-/* Machine */
+/* Machine*/
 typedef struct zvm_vm_t zvm_vm_t;
 typedef struct zvm_cpu_t zvm_cpu_t;
 typedef struct zvm_io_device_t zvm_io_device_t;
