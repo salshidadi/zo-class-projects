@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include "zvm_instruction.h"
 #include "zvm.h"
-#include <assert.h>
 
 ZVM_INSTRUCTION_HANDLER_FUNCTION_BEGIN(add)
     vm->cpu.R[output] = vm->cpu.R[left] + vm->cpu.R[right];
@@ -106,7 +103,7 @@ ZVM_INSTRUCTION_HANDLER_FUNCTION_BEGIN(in)
             vm->io_devices[port]->I[i] = zvm_stack_pop(vm);
         }
     }
-    return vm->io_devices[port]->handler(vm, port, function, argc);
+    return vm->io_devices[port]->processor(vm, port, function, argc);
 
 ZVM_INSTRUCTION_HANDLER_FUNCTION_END
 
@@ -136,6 +133,6 @@ ZVM_INSTRUCTION_HANDLER_FUNCTION_BEGIN(out)
             vm->io_devices[port]->I[i] = zvm_stack_pop(vm);
         }
     }
-    return vm->io_devices[port]->handler(vm, port, function, argc);
+    return vm->io_devices[port]->processor(vm, port, function, argc);
 
 ZVM_INSTRUCTION_HANDLER_FUNCTION_END

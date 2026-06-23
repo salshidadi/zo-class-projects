@@ -1,45 +1,31 @@
 #ifndef __ZVM_H__
 #define __ZVM_H__
 
+#include <stdio.h>
+#include <stdbool.h>
 #include <stdint.h>
-#include "zvm_exception.h"
-#include "zvm_instruction.h"
-#include "zvm_program.h"
-#include "zvm_io.h"
+#include <string.h>
+#include <assert.h>
+#include "zvm_api.h"
+#include "zvm_types.h"
 
-#define ZVM_RX_REGISTERS_COUNT 4
+bool zvm_init(zvm_vm_t *vm);
+void zvm_release(zvm_vm_t *vm);
 
-/* Machine*/
-typedef struct zvm_vm_t zvm_vm_t;
-typedef struct zvm_cpu_t zvm_cpu_t;
-typedef struct zvm_io_device_t zvm_io_device_t;
+bool zvm_init_io(zvm_vm_t *vm);
 
-struct zvm_cpu_t{
-    uint8_t IP;
-    zvm_instruction_t* IR;
-    uint8_t R[ZVM_RX_REGISTERS_COUNT];
-    uint32_t OUTPUT;
-    uint8_t FLAGS;
+bool zvm_load_program(zvm_vm_t* vm, const uint8_t *program, uint8_t program_size);
 
-    uint8_t *DR;
-    zvm_instruction_t *CR;
-    uint8_t *SR;
+bool zvm_fetch(zvm_vm_t *vm);
+bool zvm_decode(zvm_vm_t *vm);
+bool zvm_execute(zvm_vm_t *vm);
+bool zvm_except(zvm_vm_t *vm);
 
-    int8_t SP;
-};
+int zvm_run(zvm_vm_t *vm);
+int zvm_main(zvm_vm_t *vm, uint8_t *program, uint8_t program_size);
 
-#define ZVM_IO_MAX_DEVICES 4
 
-struct zvm_vm_t{
-    bool has_exception;
-    int8_t exception_type;
-    int8_t exception_code;
-
-    zvm_cpu_t cpu;
-    zvm_program_t program;
-    zvm_io_device_t* io_devices[ZVM_IO_MAX_DEVICES];
-};
-
+//TODO:
 uint8_t zvm_stack_pop(zvm_vm_t *vm);
 
 #endif

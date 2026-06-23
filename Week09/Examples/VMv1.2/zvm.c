@@ -1,10 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
 #include "zvm.h"
 
-void zvm_init(zvm_vm_t *vm){
+bool zvm_init(zvm_vm_t *vm){
     vm->cpu.IP = 0;
     vm->cpu.IR = NULL;
 
@@ -15,10 +11,22 @@ void zvm_init(zvm_vm_t *vm){
 
     vm->cpu.OUTPUT = 0;
     vm->cpu.FLAGS  = 0;
+    vm->cpu.SP = -1;
 
-    vm->cpu.DR = NULL;
-    vm->cpu.CR = NULL;
-    vm->cpu.SR = NULL;
+    return zvm_init_io(vm);
+}
+
+void zvm_release(zvm_vm_t *vm){
+    vm->cpu.IP = 0;
+    vm->cpu.IR = NULL;
+
+    vm->cpu.R[0] = 0;
+    vm->cpu.R[1] = 0;
+    vm->cpu.R[2] = 0;
+    vm->cpu.R[3] = 0;
+
+    vm->cpu.OUTPUT = 0;
+    vm->cpu.FLAGS  = 0;
     vm->cpu.SP = -1;
 }
 
@@ -27,6 +35,7 @@ void zvm_init_io(zvm_vm_t *vm){
     vm->io_devices[1] = &screen;
     vm->io_devices[2] = NULL;
     vm->io_devices[3] = NULL;
+    return true;
 }
 
 void zvm_init_program(zvm_vm_t* vm){
@@ -56,19 +65,13 @@ void zvm_init_program(zvm_vm_t* vm){
 }
 
 /* raise exception */
-static bool fetch(zvm_vm_t *vm){
+bool zvm_fetch(zvm_vm_t *vm){
     vm->cpu.IR = &vm->program.instructions[vm->cpu.IP];
     vm->cpu.IP++;
     return true;
 }
 
-static bool decode(zvm_vm_t* vm){
-    // TODO:
-    // if(!zvm_is_valid_instruction(vm->cpu.IR->metadata->opcode)){
-    //     zvm_raise(vm, DECODE, DECODE)
-    //     return false;
-    // }
-
+bool zvm_decode(zvm_vm_t* vm){
     /* input */
     uint8_t val0 = vm->cpu.IR->operands[0].value;
     uint8_t val1 = vm->cpu.IR->operands[1].value;
@@ -122,7 +125,7 @@ static bool decode(zvm_vm_t* vm){
     return true;
 }
 
-static bool execute(zvm_vm_t* vm){
+bool zvm_execute(zvm_vm_t* vm){
 
     int8_t instruction_index = vm->cpu.IR->metadata->handler.type;
     if(instruction_index >= ZVM_INSTRUCTION_HANDLERS_COUNT){
@@ -140,7 +143,7 @@ static bool execute(zvm_vm_t* vm){
     return instruction_result;
 }
 
-bool except(zvm_vm_t* vm){
+bool zvm_except(zvm_vm_t* vm){
     if(vm->has_exception){
         int8_t code = zvm_exception_get_code(vm);
 
@@ -163,51 +166,107 @@ uint8_t zvm_stack_pop(zvm_vm_t *vm)
     return top;
 }
 
-/* TODO:
-   - Remove zvm_init_program?
-*/
 
-int main(void){
-    /* declaration */
-    zvm_vm_t vm;
-
-    /* initialization */
-    zvm_init(&vm);
-    zvm_init_io(&vm);
-    zvm_init_program(&vm);
-    
+int zvm_run(zvm_vm_t *vm){    
     /* execution */
-    while(zvm_has_next_instruction(&vm)){
+    while(zvm_has_next_instruction(vm)){
         /* fetch */
-        if(!fetch(&vm)){
-            zvm_raise(&vm, FETCH, FETCH)
+        if(!zvm_fetch(vm)){
+            zvm_raise(vm, FETCH, FETCH)
             goto zvm_catch;
         }
         /* decode  */
-        if(!decode(&vm)){
-            zvm_raise(&vm, DECODE, DECODE)
+        if(!zvm_decode(vm)){
+            zvm_raise(vm, DECODE, DECODE)
             goto zvm_catch;
         }
         /* execute */
-        if(!execute(&vm)){
+        if(!zvm_execute(vm)){
             goto zvm_catch;
         }
         continue;
     /* exception handling */
     zvm_catch:
-        if(!except(&vm)){
+        if(!zvm_except(vm)){
             break;
         }else{
-            zvm_exception_reset(&vm)
+            zvm_exception_reset(vm)
         }
     }
 
-    if(vm.has_exception){
-        fprintf(stderr, "Exception(%d): %s\n", vm.exception_code,
-                    exception_handlers[vm.exception_code].message);
+    if(vm->has_exception){
+        fprintf(stderr, "Exception(%d): %s\n", vm->exception_code,
+                    exception_handlers[vm->exception_code].message);
     }
 
     /* finalization */
-
     return 0;
+}
+
+
+bool zvm_load_program(zvm_vm_t* vm, const uint8_t *program, uint8_t program_size){
+    if(vm == NULL || program == NULL){
+        return false;
+    }
+
+    if(program_size == 0){
+        return true;
+    }
+
+    if(((program_size % ZVM_INSTRUCTION_SIZE) != 0)){
+        zvm_raise(vm, LOAD, LOAD_PROGRAM)
+        return false;
+    }
+
+    uint8_t instructions_count = program_size / ZVM_INSTRUCTION_SIZE;
+    uint8_t instruction_index = 0;
+    uint8_t opcode = 0, left_operand = 0, right_operand = 0, output_operand = 0;
+
+
+    if(instructions_count > ZVM_MAX_INSTRUCTIONS_COUNT){
+        zvm_raise(vm, LOAD, LOAD_PROGRAM)
+        return false;
+    }
+
+    vm->program.instructions_count = 0;
+    for(int i = 0; i < program_size; i+= ZVM_INSTRUCTION_SIZE){
+        opcode = program[0 + i];
+        left_operand   = program[1 + i];
+        right_operand  = program[2 + i];
+        output_operand = program[3 + i];
+
+        instruction_index = (i / ZVM_INSTRUCTION_SIZE);
+
+        vm->program.instructions[instruction_index].metadata = 
+            (zvm_instruction_metadata_t*)&instruction_handlers[opcode];
+        vm->program.instructions[instruction_index].operands[0].metadata =
+            (zvm_operand_metadata_t*)&instruction_handlers[opcode].operands[0];
+        vm->program.instructions[instruction_index].operands[1].metadata =
+            (zvm_operand_metadata_t*)&instruction_handlers[opcode].operands[1];
+        vm->program.instructions[instruction_index].operands[2].metadata =
+            (zvm_operand_metadata_t*)&instruction_handlers[opcode].operands[2];
+
+        vm->program.instructions[instruction_index].operands[0].value = left_operand;
+        vm->program.instructions[instruction_index].operands[1].value = right_operand;
+        vm->program.instructions[instruction_index].operands[2].value = output_operand;
+    }
+    return true;
+}
+
+int zvm_main(zvm_vm_t *vm, uint8_t *program, uint8_t program_size){
+    int result = 0;
+    if(!zvm_init(vm)){
+        zvm_raise(vm, VM, VM_INIT)
+        return false;
+    }
+
+    if(!zvm_load_program(vm, program, program_size)){
+        zvm_except(vm);
+    }
+
+    result = zvm_run(vm);
+
+
+    zvm_release(vm);
+    return result;
 }
