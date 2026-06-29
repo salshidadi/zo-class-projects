@@ -18,7 +18,6 @@ zvm_block_t * zvm_block_new(zvm_block_count_t elements_count, uint8_t element_si
         }
     }else return NULL;
     
-    block->flags = ZVM_BLOCK_FLAG_IS_ALLOCATED | ZVM_BLOCK_FLAG_IS_ALLOCATED_BASE;
     zvm_block_init(block, element_size, elements_count);
     return block;
 }
@@ -26,22 +25,98 @@ zvm_block_t * zvm_block_new(zvm_block_count_t elements_count, uint8_t element_si
 bool zvm_block_delete(zvm_block_t *block){
     if(!block) return false;
 
-    if(block->base && ((block->flags & ZVM_BLOCK_FLAG_IS_ALLOCATED_BASE)))
+    if(block->base)
         free(block->base);
 
-    if((block->flags & ZVM_BLOCK_FLAG_IS_ALLOCATED)) free(block);
+    free(block);
+    return true;
+}
+// step(-1)
+bool zvm_block_step(zvm_block_t *block, zvm_block_offset_t to){
+    if(!block || !block->base) return false;
+    zvm_block_offset_t offset = block->offset + to;
+
+    if(offset <= ZVM_BLOCK_OFFSET_INIT_VALUE){
+        block->offset = ZVM_BLOCK_OFFSET_INIT_VALUE;
+        return false;
+    }else if(offset >= block->size){
+        block->offset = block->size;
+        return false;
+    }
+
+    block->offset = offset;
+    return true;
 }
 
-static uint8_t values[4] = {1, 2, 3, 4};
+bool zvm_block_put(zvm_block_t *block, uint8_t value){
+    if(!block || !block->base) return false;
+
+    if((block->offset > ZVM_BLOCK_OFFSET_INIT_VALUE) && (block->offset < block->size)){
+        block->base[block->offset] = value;
+        return true;
+    }
+
+    return false;
+}
+
+bool zvm_block_get(zvm_block_t *block, uint8_t *value){
+    if(!block || !block->base || !value) return false;
+    
+    if((block->offset > ZVM_BLOCK_OFFSET_INIT_VALUE) && (block->offset < block->size)){
+        *value = block->base[block->offset];
+        return true;
+    }
+
+    return false;
+}
+
+bool zvm_block_move(zvm_block_t *block, zvm_block_offset_t to){
+    if(!block || !block->base){
+        return false;
+    }
+
+    if((to > ZVM_BLOCK_OFFSET_INIT_VALUE) && (to < block->size)){
+        block->offset = to;
+        return true;
+    }
+
+    return false;
+}
+
+// TODO: block permissions + access by address
+
+
+bool zvm_block_push(zvm_block_t *block, uint8_t value){
+    if(zvm_block_step(block, 1)){
+        return zvm_block_put(block, value);
+    }
+    return false;
+}
+
+bool zvm_block_pop(zvm_block_t *block, uint8_t *value){
+    if(block && block->base && value && zvm_block_get(block, value)){
+        return zvm_block_step(block, -1);
+    }
+    return false;
+}
 
 int main(void){
-    zvm_block_t blk, *ptr;
-    blk.base = &values;
-    blk.element_count = 4;
-    blk.element_size = 1;
-    blk.offset = -1;
+    zvm_block_t * block = zvm_block_new(128, 1);
+    zvm_block_t * code = zvm_block_new(128, 1);
+    zvm_block_t * data = zvm_block_new(128, 1);
+    zvm_block_t * heap = zvm_block_new(128, 1);
+    zvm_block_t * stack = zvm_block_new(128, 1);
 
-    zvm_block_delete(&blk);
+    if(!block){
+        fprintf(stderr, "Unable to allocate a new block\n");
+        return 1;
+    }
 
+    // uint8_t value = 25;
+    // while(zvm_block_push(block, value++));
+    // while(zvm_block_pop(block, &value)){
+    //     printf("%d\n", value);
+    // }
+    zvm_block_delete(block);
     return 0;
 }
