@@ -23,6 +23,9 @@ struct blb_block_t{
 };
 
 blb_block_t *blb_block_create(uint32_t size);
+
+// TODO: blb_block_t *blb_block_from_file(char *path);
+
 void blb_block_delete(blb_block_t *block);
 
 void blb_block_print(blb_block_t *block, FILE *output);
@@ -47,7 +50,6 @@ bool blb_range_in(blb_range_t *range, int32_t value);
 
 // TODO: update step value
 
-
 struct blb_cursor_t{
     int32_t offset;
     bool fixed;
@@ -69,5 +71,13 @@ blb_blob_t *blb_blob_create(uint32_t size, uint8_t step);
 void blb_blob_delete(blb_blob_t *blob);
 
 bool blb_blob_step(blb_blob_t *blob, int32_t step);
+bool blb_blob_jump(blb_blob_t *blob, int32_t to);
+
+bool blb_blob_put(blb_blob_t *blob, uint8_t value);
+bool blb_blob_get(blb_blob_t *blob, uint8_t *value);
+
+void blb_blob_print(blb_blob_t *blob, FILE *output);
+
+
 
 #endif

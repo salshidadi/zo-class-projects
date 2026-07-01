@@ -139,7 +139,7 @@ blb_blob_t *blb_blob_create(uint32_t size, uint8_t step){
         if(blob->block){
             blob->range = blb_range_create(0, size, step, true);
             if(blob->range){
-                blob->cursor = blb_cursor_create(-1, true);
+                blob->cursor = blb_cursor_create(-1, false);
                 if(blob->cursor) {
                     return blob;
                 }
@@ -164,6 +164,40 @@ bool blb_blob_step(blb_blob_t *blob, int32_t step){
         return blb_cursor_step(blob->cursor, step);
     }
     return false;
+}
+
+bool blb_blob_jump(blb_blob_t *blob, int32_t to){
+    if(blob && blb_range_in(blob->range, (to))){
+        return blb_cursor_jump(blob->cursor, to);
+    }
+    return false;
+}
+
+bool blb_blob_put(blb_blob_t *blob, uint8_t value){
+    if(blob && blb_range_in(blob->range, blob->cursor->offset)){
+        return blb_block_put(blob->block, blob->cursor->offset, value);
+    }
+    return false;
+}
+
+bool blb_blob_get(blb_blob_t *blob, uint8_t *value){
+    if(blob && blb_range_in(blob->range, blob->cursor->offset)){
+        return blb_block_get(blob->block, blob->cursor->offset, value);
+    }
+    return false;
+}
+
+void blb_blob_print(blb_blob_t *blob, FILE *output){
+    if(!blob || !output) return;
+
+    printf("blob.size: %u\n\n", blob->block->size);
+    for(int32_t i = 0; i < blob->block->size; i++){
+        if(blob->cursor->offset == i){
+            fprintf(output, "\033[1;31m->\033[0m %d: %02x\n", i, blob->block->base[i]);
+        }else{
+            fprintf(output, "   %d: %02x\n", i, blob->block->base[i]);
+        }
+    }
 }
 
 
@@ -248,6 +282,17 @@ int main2(void){
 }
 
 int main(void){
-    
+    blb_blob_t *blb = blb_blob_create(8, 1);
+    if(blb){
+        blb_blob_step(blb, 1);
+        blb_blob_step(blb, 1);
+        
+        blb_blob_put(blb, 0xfd);
+        blb_blob_jump(blb, 5);
+        blb_blob_put(blb, 0xec);
+        blb_blob_print(blb, stdout);
+
+        blb_blob_delete(blb);
+    }
     return 0;
 }
