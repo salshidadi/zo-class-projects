@@ -13,3 +13,6 @@ Run the script by providing a **folder name** and a **file name** as arguments:
 
 ```bash
 ./createProject <folder_name> <file_name>
+```
+
+### This tool was created by Salman Alharbi and Khalid Alzahrani
